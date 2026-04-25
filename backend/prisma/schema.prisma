@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  FINISHED
+  POSTPONED
+  CANCELLED
+}
+
+enum ReactionType {
+  FIRE
+  GOAL
+  SHOCKED
+  LAUGH
+  SAD
+}
+
+enum NotificationType {
+  FOLLOWER_PREDICTION
+  PREDICTION_SCORED
+  MATCH_STARTING
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  username     String   @unique
+  passwordHash String
+  avatar       String?
+  createdAt    DateTime @default(now())
+
+  following         Follow[]       @relation("Follower")
+  followers         Follow[]       @relation("Following")
+  comments          Comment[]
+  reactions         Reaction[]
+  predictions       Prediction[]
+  notifications     Notification[] @relation("Recipient")
+  sentNotifications Notification[] @relation("Sender")
+}
+
+model Follow {
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+}
+
+model Match {
+  id         String      @id @default(uuid())
+  externalId Int         @unique
+  homeTeam   String
+  awayTeam   String
+  homeLogo   String?
+  awayLogo   String?
+  league     String
+  status     MatchStatus @default(SCHEDULED)
+  homeScore  Int?
+  awayScore  Int?
+  kickoff    DateTime
+  venue      String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  comments    Comment[]
+  reactions   Reaction[]
+  predictions Prediction[]
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  userId    String
+  matchId   String
+  content   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+}
+
+model Reaction {
+  id        String       @id @default(uuid())
+  userId    String
+  matchId   String
+  type      ReactionType
+  createdAt DateTime     @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, matchId])
+}
+
+model Prediction {
+  id            String   @id @default(uuid())
+  userId        String
+  matchId       String
+  predictedHome Int
+  predictedAway Int
+  pointsEarned  Int?
+  scored        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, matchId])
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  recipientId String
+  senderId    String?
+  type        NotificationType
+  payload     Json
+  read        Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  recipient User  @relation("Recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  sender    User? @relation("Sender", fields: [senderId], references: [id], onDelete: SetNull)
+}
