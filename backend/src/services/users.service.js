@@ -110,3 +110,32 @@ export const getFollowersService = async (id, page, limit) => {
     total,
   };
 };
+
+export const getFollowingService = async (id, page, limit) => {
+  const user = await prisma.user.findUnique({
+    where: { id },
+  });
+  if (!user) {
+    const error = new Error("User Not Found");
+    error.statusCode = 404;
+    throw error;
+  }
+  const [followings, total] = await Promise.all([
+    prisma.follow.findMany({
+      where: { followerId: id },
+      include: {
+        following: { select: { id: true, username: true, avatar: true } },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.follow.count({ where: { followerId: id } }),
+  ]);
+
+  return {
+    followings: followings.map((f) => f.following),
+    page,
+    limit,
+    total,
+  };
+};
