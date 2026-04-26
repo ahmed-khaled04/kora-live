@@ -12,10 +12,11 @@ See `PLAN.md` for full architecture, database schema, API endpoints, and impleme
 - **Structure**: npm workspaces monorepo
 
 ## Current Phase
-Phase 2 — Auth
+Phase 3 — Follow System
 
 ## Completed Phases
 - **Phase 1 — Project Scaffold**: monorepo setup, Express skeleton, docker-compose (Postgres + Redis), Prisma init, full schema defined and migrated (`init` migration), `.env` configured
+- **Phase 2 — Auth**: register/login/me endpoints, JWT, bcrypt, express-validator, error middleware, DB connection log on startup
 
 ## Commands
 
