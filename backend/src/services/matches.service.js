@@ -56,7 +56,9 @@ export const getUpcomingMatches = async () => {
 
   const today = new Date().toISOString().split("T")[0];
   const data = await fetchUpcomingMatches(today);
-  const matches = data.events.map(mapMatch);
+  const matches = data.events
+    .filter((event) => event.status.type === "notstarted")
+    .map(mapMatch);
 
   for (const match of matches) {
     await prisma.match.upsert({

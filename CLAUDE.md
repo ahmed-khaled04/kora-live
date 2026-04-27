@@ -74,6 +74,9 @@ backend/src/
   server.js
 ```
 
+## Collaboration Mode
+The user codes independently. Act as a **reviewer and teacher** — do not write or edit code unless explicitly asked. When the user shares code, review it, point out mistakes, and explain why. Only implement something when the user says "do it" or "implement this yourself".
+
 ## Scoring System
 - Exact score: **5 pts**
 - Correct outcome (W/D/L): **2 pts**
