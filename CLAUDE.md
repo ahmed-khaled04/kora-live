@@ -76,7 +76,7 @@ backend/src/
 ```
 
 ## Collaboration Mode
-The user codes independently. Act as a **reviewer and teacher** — do not write or edit code unless explicitly asked. When the user shares code, review it, point out mistakes, and explain why. Only implement something when the user says "do it" or "implement this yourself".
+The user codes independently. Act as a **reviewer and teacher** — do not write or edit code unless explicitly asked. When the user shares code, review it, point out mistakes, and explain why. Also highlight good practices and well-written parts so the user knows what to keep doing. Only implement something when the user says "do it" or "implement this yourself".
 
 ## Scoring System
 - Exact score: **5 pts**
