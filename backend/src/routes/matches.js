@@ -8,6 +8,7 @@ import {
   postReaction,
   deleteReaction,
 } from "../controllers/reactions.js";
+import { postPrediction } from "../controllers/predictions.js";
 import { authenticate } from "../middleware/auth.js";
 
 const router = Router();
@@ -37,5 +38,20 @@ router.post(
   postReaction,
 );
 router.delete("/:id/reactions", authenticate, deleteReaction);
+
+// Predictions
+router.post(
+  "/:id/predictions",
+  authenticate,
+  [
+    body("predictedHome", "Score cant negative or empty")
+      .notEmpty()
+      .isInt({ min: 0 }),
+    body("predictedAway", "Score cant negative or empty")
+      .notEmpty()
+      .isInt({ min: 0 }),
+  ],
+  postPrediction,
+);
 
 export default router;
