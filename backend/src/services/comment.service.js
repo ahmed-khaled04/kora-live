@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import { getIO } from "../sockets/index.js";
 
 export const addComment = async (userId, matchId, content) => {
   const match = await prisma.match.findUnique({ where: { id: matchId } });
@@ -17,6 +18,7 @@ export const addComment = async (userId, matchId, content) => {
       user: { select: { id: true, username: true, avatar: true } },
     },
   });
+  getIO().to(`match:${matchId}`).emit("comment:created", { comment });
   return comment;
 };
 

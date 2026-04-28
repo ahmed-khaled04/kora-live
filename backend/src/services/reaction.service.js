@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import { getIO } from "../sockets/index.js";
 
 export const fetchReaction = async (matchId) => {
   const match = await prisma.match.findUnique({
@@ -35,6 +36,8 @@ export const addReaction = async (userId, matchId, type) => {
     update: { type },
     create: { userId, matchId, type },
   });
+  const counts = await fetchReaction(matchId);
+  getIO().to(`match:${matchId}`).emit("reaction:updated", { counts });
   return reaction;
 };
 
@@ -42,4 +45,6 @@ export const removeReaction = async (userId, matchId) => {
   await prisma.reaction.deleteMany({
     where: { userId, matchId },
   });
+  const counts = await fetchReaction(matchId);
+  getIO().to(`match:${matchId}`).emit("reaction:updated", { counts });
 };
