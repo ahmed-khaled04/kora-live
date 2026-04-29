@@ -1,7 +1,7 @@
 import prisma from "../config/prisma.js";
 import { calculatePoints } from "../utils/scoring.js";
 
-export const scorePredicion = async (id) => {
+export const scorePrediction = async (id) => {
   const match = await prisma.match.findUnique({ where: { id } });
   if (!match) {
     const error = new Error("Match Not found");
