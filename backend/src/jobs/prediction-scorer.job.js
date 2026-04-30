@@ -1,7 +1,12 @@
 import prisma from "../config/prisma.js";
+import redis from "../config/redis.js";
 import { calculatePoints } from "../utils/scoring.js";
 
 export const scorePrediction = async (id) => {
+  const keys = await redis.keys("leaderboard:*");
+  if (keys > 0) {
+    await redis.del(keys);
+  }
   const match = await prisma.match.findUnique({ where: { id } });
   if (!match) {
     const error = new Error("Match Not found");
