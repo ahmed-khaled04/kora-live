@@ -12,7 +12,7 @@ See `PLAN.md` for full architecture, database schema, API endpoints, and impleme
 - **Structure**: npm workspaces monorepo
 
 ## Current Phase
-Phase 7 — Predictions
+Phase 8 — Match Poller
 
 ## Completed Phases
 - **Phase 1 — Project Scaffold**: monorepo setup, Express skeleton, docker-compose (Postgres + Redis), Prisma init, full schema defined and migrated (`init` migration), `.env` configured
@@ -21,6 +21,7 @@ Phase 7 — Predictions
 - **Phase 4 — Sports Integration**: SportAPI axios wrapper, Redis cache layer, match upserts, GET /matches/live, /upcoming, /:id
 - **Phase 5 — Reactions & Comments**: Comment + Reaction service/controller/routes, paginated comments, grouped reaction counts, upsert reactions, GET/POST /matches/:id/comments, GET/POST/DELETE /matches/:id/reactions
 - **Phase 6 — WebSockets**: Socket.io setup with JWT auth on handshake, match room join/leave, real-time `comment:created` broadcast from comment service, real-time `reaction:updated` broadcast with grouped counts from reaction service, module singleton `getIO()` pattern
+- **Phase 7 — Predictions**: Prediction model with unique constraint, submit endpoint with SCHEDULED guard and duplicate prevention (P2002), `utils/scoring.js` (exact 5pts/outcome 2pts/wrong 0pts), `prediction-scorer.job.js` triggered on match finish
 
 ## Commands
 
