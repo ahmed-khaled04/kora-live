@@ -22,6 +22,8 @@ export const initSocket = (httpServer) => {
   });
 
   io.on("connection", (socket) => {
+    socket.join(`user:${socket.user.id}`);
+
     socket.on("match:join", ({ matchId }) => {
       socket.join(`match:${matchId}`);
     });

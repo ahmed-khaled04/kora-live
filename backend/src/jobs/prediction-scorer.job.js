@@ -1,6 +1,7 @@
 import prisma from "../config/prisma.js";
 import redis from "../config/redis.js";
 import { calculatePoints } from "../utils/scoring.js";
+import { enqueueNotification } from "./notification.queue.js";
 
 export const scorePrediction = async (id) => {
   const keys = await redis.keys("leaderboard:*");
@@ -16,7 +17,7 @@ export const scorePrediction = async (id) => {
   const predictions = await prisma.prediction.findMany({
     where: { scored: false, matchId: id },
   });
-  await prisma.$transaction(
+  const scored = await prisma.$transaction(
     predictions.map((p) => {
       return prisma.prediction.update({
         where: { id: p.id },
@@ -32,4 +33,13 @@ export const scorePrediction = async (id) => {
       });
     }),
   );
+
+  scored.forEach((p) => {
+    enqueueNotification("PREDICTION_SCORED", {
+      userId: p.userId,
+      predictionId: p.id,
+      matchId: p.matchId,
+      points: p.pointsEarned,
+    });
+  });
 };

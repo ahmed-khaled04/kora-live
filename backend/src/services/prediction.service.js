@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import { enqueueNotification } from "../jobs/notification.queue.js";
 
 export const addPrediction = async (
   userId,
@@ -25,6 +26,11 @@ export const addPrediction = async (
         predictedHome: predictedHome,
         predictedAway: predictedAway,
       },
+    });
+    enqueueNotification("FOLLOWER_PREDICTION", {
+      senderId: userId,
+      predictionId: prediction.id,
+      matchId,
     });
     return prediction;
   } catch (err) {
