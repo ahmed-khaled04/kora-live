@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import prisma from "../config/prisma.js";
 import { signToken } from "../utils/jwt.js";
 
-export const registerService = async (email, username, password) => {
+export const registerService = async (email, username, password, avatarUrl = null) => {
   const existing = await prisma.user.findFirst({
     where: { OR: [{ email }, { username }] },
   });
@@ -18,7 +18,7 @@ export const registerService = async (email, username, password) => {
   }
   const passwordHash = await bcrypt.hash(password, 10);
   const user = await prisma.user.create({
-    data: { email, username, passwordHash },
+    data: { email, username, passwordHash, avatar: avatarUrl },
   });
 
   return signToken(user.id);

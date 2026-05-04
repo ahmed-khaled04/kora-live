@@ -111,6 +111,14 @@ export const getFollowersService = async (id, page, limit) => {
   };
 };
 
+export const updateAvatarService = async (userId, avatarUrl) => {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { avatar: avatarUrl },
+    select: { id: true, username: true, avatar: true },
+  });
+};
+
 export const getFollowingService = async (id, page, limit) => {
   const user = await prisma.user.findUnique({
     where: { id },

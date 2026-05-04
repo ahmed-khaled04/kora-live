@@ -6,9 +6,11 @@ import {
   getFollowing,
   getProfile,
   unfollow,
+  updateAvatar,
 } from "../controllers/users.js";
 
 import { authenticate } from "../middleware/auth.js";
+import { uploadAvatar } from "../middleware/upload.js";
 
 const router = Router();
 
@@ -23,5 +25,7 @@ router.delete("/:id/follow", authenticate, unfollow);
 
 router.get("/:id/followers", getFollowers);
 router.get("/:id/following", getFollowing);
+
+router.patch("/me/avatar", authenticate, uploadAvatar.single("avatar"), updateAvatar);
 
 export default router;

@@ -4,7 +4,22 @@ import {
   unfollowService,
   getFollowersService,
   getFollowingService,
+  updateAvatarService,
 } from "../services/users.service.js";
+
+export const updateAvatar = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      const error = new Error("No file uploaded");
+      error.statusCode = 400;
+      throw error;
+    }
+    const user = await updateAvatarService(req.userId, req.file.path);
+    return res.status(200).json({ message: "Avatar updated", user });
+  } catch (err) {
+    next(err);
+  }
+};
 
 export const getProfile = async (req, res, next) => {
   const id = req.params.id;

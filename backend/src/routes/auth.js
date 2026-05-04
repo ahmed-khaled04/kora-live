@@ -3,11 +3,13 @@ import { body } from "express-validator";
 
 import { authenticate } from "../middleware/auth.js";
 import { register, login, currentUser } from "../controllers/auth.js";
+import { uploadAvatar } from "../middleware/upload.js";
 
 const router = Router();
 
 router.post(
   "/register",
+  uploadAvatar.single("avatar"),
   [
     body("email").isEmail().withMessage("Enter a valid email"),
     body("username", "Enter a valid username")

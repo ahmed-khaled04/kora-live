@@ -15,9 +15,10 @@ export const register = async (req, res, next) => {
     return next(error);
   }
   const { email, username, password } = req.body;
+  const avatarUrl = req.file?.path ?? null;
 
   try {
-    const token = await registerService(email, username, password);
+    const token = await registerService(email, username, password, avatarUrl);
     return res
       .status(201)
       .json({ message: "User registered successfully", token });
