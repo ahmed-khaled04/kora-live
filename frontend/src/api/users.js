@@ -9,10 +9,16 @@ export const follow = (id) =>
 export const unfollow = (id) =>
   api.delete(`/users/${id}/follow`).then((r) => r.data);
 
-// followers response is spread: { message, followers, page, limit, total }
 export const getFollowers = (id, page = 1) =>
   api.get(`/users/${id}/followers`, { params: { page, limit: 10 } }).then((r) => r.data);
 
-// following response is spread: { message, followings, page, limit, total }
 export const getFollowing = (id, page = 1) =>
   api.get(`/users/${id}/following`, { params: { page, limit: 10 } }).then((r) => r.data);
+
+export const updateAvatar = (file) => {
+  const formData = new FormData();
+  formData.append("avatar", file);
+  return api.patch("/users/me/avatar", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  }).then((r) => r.data.user);
+};

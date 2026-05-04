@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { getProfile, getFollowers, getFollowing } from "@/api/users";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getProfile, getFollowers, getFollowing, updateAvatar } from "@/api/users";
 import { useAuth } from "@/context/AuthContext";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/FollowButton";
@@ -16,6 +16,7 @@ function UserRow({ user }) {
       className="flex items-center gap-3 px-4 py-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
     >
       <Avatar className="h-8 w-8">
+        {user.avatar && <AvatarImage src={user.avatar} alt={user.username} />}
         <AvatarFallback className="text-xs">
           {user.username[0].toUpperCase()}
         </AvatarFallback>
@@ -53,13 +54,30 @@ function UserList({ fetchFn, queryKey }) {
 
 export default function ProfilePage() {
   const { id } = useParams();
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, updateUser } = useAuth();
   const isOwnProfile = currentUser?.id === id;
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef(null);
+  const [uploading, setUploading] = useState(false);
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["users", id],
     queryFn: () => getProfile(id),
   });
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const updated = await updateAvatar(file);
+      updateUser({ avatar: updated.avatar });
+      queryClient.setQueryData(["users", id], (prev) => ({ ...prev, avatar: updated.avatar }));
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
 
   if (isLoading) return <p className="text-muted-foreground">Loading profile...</p>;
   if (!profile) return <p className="text-destructive">User not found.</p>;
@@ -67,11 +85,36 @@ export default function ProfilePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Avatar className="h-16 w-16">
-          <AvatarFallback className="text-2xl">
-            {profile.username[0].toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+
+        {/* Avatar with upload overlay on own profile */}
+        <div className="relative group">
+          <Avatar className="h-16 w-16">
+            {profile.avatar && <AvatarImage src={profile.avatar} alt={profile.username} />}
+            <AvatarFallback className="text-2xl">
+              {profile.username[0].toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          {isOwnProfile && (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+            >
+              <span className="text-white text-xs font-semibold">
+                {uploading ? "..." : "Edit"}
+              </span>
+            </button>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={handleAvatarUpload}
+          />
+        </div>
+
         <div className="flex-1">
           <h1 className="font-bold text-xl">{profile.username}</h1>
           <div className="flex gap-4 mt-1">

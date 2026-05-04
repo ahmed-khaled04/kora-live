@@ -94,9 +94,13 @@ function Navbar() {
 
       {/* Nav links */}
       <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-        {["Features", "Leaderboard", "Matches"].map((label) => (
-          <NavLink key={label} label={label} />
-        ))}
+        {[
+            { label: "Features", href: "#features" },
+            { label: "Leaderboard", href: "#leaderboard" },
+            { label: "Matches", href: "#matches" },
+          ].map(({ label, href }) => (
+            <NavLink key={label} label={label} href={href} />
+          ))}
       </div>
 
       {/* Buttons */}
@@ -112,11 +116,11 @@ function Navbar() {
   );
 }
 
-function NavLink({ label }) {
+function NavLink({ label, href }) {
   const [hovered, setHovered] = useState(false);
   return (
     <a
-      href="#"
+      href={href}
       style={{
         color: hovered ? "#fff" : "#999",
         fontSize: 13,
@@ -819,6 +823,7 @@ function StatsBar() {
 
   return (
     <motion.section
+      id="matches"
       ref={ref}
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -953,6 +958,7 @@ function FeaturesGrid() {
 
   return (
     <section
+      id="features"
       style={{
         padding: "100px 32px",
         maxWidth: 1100,
@@ -1105,6 +1111,7 @@ function HowItWorks() {
 
   return (
     <section
+      id="leaderboard"
       ref={lineRef}
       style={{
         padding: "100px 32px",

@@ -38,8 +38,10 @@ export function AuthProvider({ children }) {
     disconnectSocket();
   };
 
+  const updateUser = (partial) => setUser((prev) => ({ ...prev, ...partial }));
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

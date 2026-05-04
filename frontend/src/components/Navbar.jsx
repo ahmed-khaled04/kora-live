@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Bell, Trophy, Home, LogOut, Moon, Sun } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -138,6 +138,7 @@ export default function Navbar() {
                   width: 22,
                   height: 22,
                   borderRadius: "50%",
+                  overflow: "hidden",
                   background: "#16a34a22",
                   border: "1px solid #16a34a55",
                   display: "flex",
@@ -146,9 +147,13 @@ export default function Navbar() {
                   fontSize: 11,
                   fontWeight: 700,
                   color: "var(--app-green)",
+                  flexShrink: 0,
                 }}
               >
-                {user?.username?.[0]?.toUpperCase()}
+                {user?.avatar
+                  ? <img src={user.avatar} alt={user.username} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  : user?.username?.[0]?.toUpperCase()
+                }
               </div>
               <span style={{ fontSize: 13, color: "var(--app-muted)" }}>
                 {user?.username}
@@ -168,6 +173,8 @@ export default function Navbar() {
 
 function NavLink({ to, icon, label }) {
   const [hovered, setHovered] = useState(false);
+  const { pathname } = useLocation();
+  const active = pathname === to;
   return (
     <Link
       to={to}
@@ -178,12 +185,13 @@ function NavLink({ to, icon, label }) {
         padding: "5px 10px",
         borderRadius: 6,
         fontSize: 13,
-        fontWeight: 500,
-        color: hovered ? "var(--app-text)" : "var(--app-muted)",
-        background: hovered ? "var(--app-surface2)" : "transparent",
+        fontWeight: active ? 600 : 500,
+        color: active ? "var(--app-green)" : hovered ? "var(--app-text)" : "var(--app-muted)",
+        background: active ? "var(--app-green)18" : hovered ? "var(--app-surface2)" : "transparent",
         textDecoration: "none",
         transition: "color 0.2s, background 0.2s",
         fontFamily: "'Space Grotesk', sans-serif",
+        borderBottom: active ? "2px solid var(--app-green)" : "2px solid transparent",
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
