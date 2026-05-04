@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.js";
 import { getIO } from "../sockets/index.js";
+import { sendPredictionScoredEmail } from "./email.service.js";
 
 export const handleFollowerPrediction = async (data) => {
   const { senderId, predictionId, matchId } = data;
@@ -57,18 +58,25 @@ export const readAll = async (userId) => {
 
 export const handlePredictionScored = async (data) => {
   const { userId, predictionId, matchId, points } = data;
-  const notification = await prisma.notification.create({
-    data: {
-      type: "PREDICTION_SCORED",
-      recipientId: userId,
-      payload: {
-        predictionId,
-        matchId,
-        points,
+
+  const [notification, user, match] = await Promise.all([
+    prisma.notification.create({
+      data: {
+        type: "PREDICTION_SCORED",
+        recipientId: userId,
+        payload: { predictionId, matchId, points },
       },
-    },
-  });
-  getIO()
-    .to(`user:${notification.recipientId}`)
-    .emit("notification:new", notification);
+    }),
+    prisma.user.findUnique({ where: { id: userId }, select: { email: true } }),
+    prisma.match.findUnique({
+      where: { id: matchId },
+      select: { homeTeam: true, awayTeam: true, homeScore: true, awayScore: true },
+    }),
+  ]);
+
+  getIO().to(`user:${notification.recipientId}`).emit("notification:new", notification);
+
+  if (user?.email && match) {
+    await sendPredictionScoredEmail(user.email, points, match);
+  }
 };
