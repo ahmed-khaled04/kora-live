@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getLeaderboard } from "@/api/leaderboard";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -57,6 +57,7 @@ export default function LeaderboardPage() {
               {rank}
             </span>
             <Avatar className="h-8 w-8">
+              <AvatarImage src={user.avatar} alt={user.username} />
               <AvatarFallback className="text-xs">
                 {user.username[0].toUpperCase()}
               </AvatarFallback>
